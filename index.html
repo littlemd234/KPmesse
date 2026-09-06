@@ -1,257 +1,310 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Convention Quiz</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>KP Quiz</title>
     <style>
-        :root {
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #2c3e50;
-            --primary: #3498db;
-            --yes-color: #2ecc71;
-            --yes-hover: #27ae60;
-            --no-color: #e74c3c;
-            --no-hover: #c0392b;
-        }
+      :root {
+        --bg-color: #f4f7f6;
+        --card-bg: #ffffff;
+        --text-color: #2c3e50;
+        --primary: #7f8c8d; /* Neutrales Grau für Fortschrittsbalken/Restart */
 
-        /* Prevent scrolling and text selection for a kiosk/iPad feel */
-        * {
-            box-sizing: border-box;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+        /* Neuer edler Farbverlauf für beide Buttons */
+        --btn-grad-start: #ffffff;
+        --btn-grad-end: #e6e9ea;
+        --btn-border: #bdc3c7;
+        --btn-text: #2c3e50;
+      }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
+      /* Prevent scrolling and text selection for a kiosk/iPad feel */
+      * {
+        box-sizing: border-box;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-        .container {
-            width: 100%;
-            max-width: 768px; /* Optimized for iPad portrait width */
-            padding: 40px 20px;
-            text-align: center;
-        }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        overflow: hidden;
+      }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            min-height: 450px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-        }
+      .container {
+        width: 100%;
+        max-width: 768px; /* Optimized for iPad portrait width */
+        padding: 40px 20px;
+        text-align: center;
+      }
 
-        /* Progress Bar */
-        .progress-container {
-            width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            height: 12px;
-            overflow: hidden;
-        }
+      .card {
+        background: var(--card-bg);
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        min-height: 450px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: all 0.3s ease;
+      }
 
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background-color: var(--primary);
-            transition: width 0.3s ease;
-        }
+      /* Progress Bar */
+      .progress-container {
+        width: 100%;
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        height: 12px;
+        overflow: hidden;
+      }
 
-        /* Typography */
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
+      .progress-bar {
+        height: 100%;
+        width: 0%;
+        background-color: var(--primary);
+        transition: width 0.3s ease;
+      }
 
-        .question-text {
-            font-size: 2.2rem;
-            font-weight: 600;
-            line-height: 1.4;
-            margin: auto 0;
-            padding: 20px 0;
-        }
+      /* Typography */
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+      }
 
-        .result-text {
-            font-size: 2rem;
-            line-height: 1.5;
-            margin-bottom: 40px;
-        }
+      .question-text {
+        font-size: 2.2rem;
+        font-weight: 600;
+        line-height: 1.4;
+        margin: auto 0;
+        padding: 20px 0;
+      }
 
-        /* Large Touch Buttons */
-        .btn-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-top: 20px;
-        }
+      .result-text {
+        font-size: 2rem;
+        line-height: 1.5;
+        margin-bottom: 40px;
+      }
 
-        .btn {
-            font-size: 2rem;
-            font-weight: bold;
-            color: white;
-            border: none;
-            border-radius: 16px;
-            padding: 35px 0;
-            cursor: pointer;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-            transition: transform 0.1s, opacity 0.2s;
-        }
+      /* Large Touch Buttons */
+      .btn-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-top: 20px;
+      }
 
-        .btn:active {
-            transform: scale(0.97);
-        }
+      .btn {
+        font-size: 2.2rem;
+        font-weight: bold;
+        color: var(--btn-text);
+        background: linear-gradient(
+          to bottom,
+          var(--btn-grad-start),
+          var(--btn-grad-end)
+        );
+        border: 2px solid var(--btn-border);
+        border-radius: 16px;
+        padding: 40px 0;
+        cursor: pointer;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+        transition:
+          transform 0.1s,
+          background 0.2s;
+      }
 
-        .btn-yes {
-            background-color: var(--yes-color);
-        }
-        
-        .btn-no {
-            background-color: var(--no-color);
-        }
+      .btn:active {
+        transform: scale(0.97);
+        background: linear-gradient(
+          to bottom,
+          var(--btn-grad-end),
+          var(--btn-grad-start)
+        );
+      }
 
-        .btn-restart {
-            background-color: var(--primary);
-            grid-column: span 2;
-            padding: 25px 0;
-            font-size: 1.6rem;
-        }
+      .btn-yes {
+        background-color: var(--yes-color);
+      }
 
-        /* Views management */
-        .view {
-            display: none;
-        }
+      .btn-no {
+        background-color: var(--no-color);
+      }
 
-        .view.active {
-            display: flex;
-        }
+      .btn-restart {
+        background: var(--primary);
+        color: white;
+        border: none;
+        grid-column: span 2;
+        padding: 25px 0;
+        font-size: 1.6rem;
+      }
+
+      /* Views management */
+      .view {
+        display: none;
+      }
+
+      .view.active {
+        display: flex;
+      }
+
+      /* Logo Styling */
+      .logo-container {
+        width: 375px;
+        height: 77px;
+        margin: 0 auto 20px auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .logo-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
     </style>
-</head>
-<body>
-
-    <div class="container">
-        <!-- QUIZ VIEW -->
-        <div id="quiz-view" class="card view active">
-            <div class="progress-container">
-                <div id="progress" class="progress-bar"></div>
-            </div>
-            <div id="question" class="question-text">Lade Frage...</div>
-            <div class="btn-container">
-                <button class="btn btn-yes" onclick="handleAnswer(true)">JA</button>
-                <button class="btn btn-no" onclick="handleAnswer(false)">NEIN</button>
-            </div>
+  </head>
+  <body>
+<div class="container">
+    <!-- QUIZ VIEW -->
+    <div id="quiz-view" class="card view active">
+        <!-- Logo Platzhalter (Erwartet eine 'logo.svg' im selben Ordner) -->
+        <div class="logo-container">
+            <img src="logo.svg" alt="Convention Logo">
         </div>
 
-        <!-- RESULT VIEW -->
-        <div id="result-view" class="card view">
-            <h1>Dein Ergebnis</h1>
-            <div id="result-message" class="result-text">Lade Auswertung...</div>
-            <div class="btn-container">
-                <button class="btn btn-restart" onclick="restartQuiz()">Neu starten</button>
-            </div>
+        <div class="progress-container">
+            <div id="progress" class="progress-bar"></div>
+        </div>
+        <div id="question" class="question-text">Lade Frage...</div>
+        <div class="btn-container">
+            <!-- Beide Buttons nutzen jetzt das identische, cleane Design -->
+            <button class="btn" onclick="handleAnswer(true)">JA</button>
+            <button class="btn" onclick="handleAnswer(false)">NEIN</button>
         </div>
     </div>
 
+    <!-- RESULT VIEW -->
+    <div id="result-view" class="card view">
+        <!-- Optional: Logo auch auf dem Ergebnis-Screen anzeigen -->
+        <div class="logo-container">
+            <img src="logo.svg" alt="Convention Logo">
+        </div>
+        
+        <h1>Dein Ergebnis</h1>
+        <div id="result-message" class="result-text">Lade Auswertung...</div>
+        <div class="btn-container">
+            <button class="btn btn-restart" onclick="restartQuiz()">Neu starten</button>
+        </div>
+    </div>
+</div>
+
     <script>
-        // Define your 10 custom questions here
-        const questions = [
-            "Arbeitest Du gerne sorgfältig und genau?",
-            "Hast Du Spaß daran, mit Zahlen zu arbeiten?",
-            "Kannst Du dich gut über längere Zeit konzentrieren?",
-            "Interessierst Du dich dafür, wie Steuern, Geld und Finanzen funktionieren?",
-            "Arbeitest Du gerne am Computer?",
-            "Kannst Du gut mit vertraulichen Informationen umgehen?",
-            "Erklärst Du anderen gerne Dinge und kannst Du gut kommunizieren?",
-            "Arbeitest Du gerne selbständig, aber auch im Team?",
-            "Bleibst Du auch bei komplizierten Aufgaben geduldig?",
-            "Hast Du Lust, ständig Neues zu lernen, weil sich Gesetze und Vorschriften ändern können?"
-        ];
+      // Define your 10 custom questions here
+      const questions = [
+        "Arbeitest Du gerne sorgfältig und genau?",
+        "Hast Du Spaß daran, mit Zahlen zu arbeiten?",
+        "Kannst Du dich gut über längere Zeit konzentrieren?",
+        "Interessierst Du dich dafür, wie Steuern, Geld und Finanzen funktionieren?",
+        "Arbeitest Du gerne am Computer?",
+        "Kannst Du gut mit vertraulichen Informationen umgehen?",
+        "Erklärst Du anderen gerne Dinge und kannst Du gut kommunizieren?",
+        "Arbeitest Du gerne selbständig, aber auch im Team?",
+        "Bleibst Du auch bei komplizierten Aufgaben geduldig?",
+        "Hast Du Lust, ständig Neues zu lernen, weil sich Gesetze und Vorschriften ändern können?",
+      ];
 
-        // Define your 4 dynamic outcomes based on the number of "Yes" answers
-        const outcomes = {
-            expert: "🎯 Steuer-Talent! Der Beruf Steuerfachangestellte/r könnte sehr gut zu Dir passen.",      // 0-2 Yes
-            high: "👍 Gute Voraussetzungen! Schau Dir den Beruf unbedingt genauer an.", // 3-5 Yes
-            medium: "🔍 Interessant! Vielleicht gibt es Bereiche des Berufs, die besonders gut zu Dir passen.",         // 6-8 Yes
-            low: "💡 Kein Problem! Ein Beruf sollte vor allem zu deinen Interessen und Stärken passen - entdecke noch andere Möglichkeiten."        // 9-10 Yes
-        };
+      // Define your 4 dynamic outcomes based on the number of "Yes" answers
+      const outcomes = {
+        expert:
+          "🎯 Steuer-Talent! Der Beruf Steuerfachangestellte/r könnte sehr gut zu Dir passen.", // 0-2 Yes
+        high: "👍 Gute Voraussetzungen! Schau Dir den Beruf unbedingt genauer an.", // 3-5 Yes
+        medium:
+          "🔍 Interessant! Vielleicht gibt es Bereiche des Berufs, die besonders gut zu Dir passen.", // 6-8 Yes
+        low: "💡 Kein Problem! Ein Beruf sollte vor allem zu deinen Interessen und Stärken passen - entdecke noch andere Möglichkeiten.", // 9-10 Yes
+      };
 
-        let currentQuestionIndex = 0;
-        let yesCounter = 0;
+      let currentQuestionIndex = 0;
+      let yesCounter = 0;
 
-        function updateQuiz() {
-            if (currentQuestionIndex < questions.length) {
-                // Update question text
-                document.getElementById("question").innerText = questions[currentQuestionIndex];
-                // Update progress bar
-                const progressPercent = (currentQuestionIndex / questions.length) * 100;
-                document.getElementById("progress").style.width = progressPercent + "%";
-            } else {
-                showResults();
-            }
+      function updateQuiz() {
+        if (currentQuestionIndex < questions.length) {
+          // Update question text
+          document.getElementById("question").innerText =
+            questions[currentQuestionIndex];
+          // Update progress bar
+          const progressPercent =
+            (currentQuestionIndex / questions.length) * 100;
+          document.getElementById("progress").style.width =
+            progressPercent + "%";
+        } else {
+          showResults();
         }
+      }
 
-        function handleAnswer(isYes) {
-            if (isYes) {
-                yesCounter++;
-            }
-            currentQuestionIndex++;
-            updateQuiz();
+      function handleAnswer(isYes) {
+        if (isYes) {
+          yesCounter++;
         }
-
-        function showResults() {
-            // Switch views
-            document.getElementById("quiz-view").classList.remove("active");
-            document.getElementById("result-view").classList.add("active");
-
-            // Determine final answer based on counter score
-            let finalMessage = "";
-            if (yesCounter <= 2) {
-                finalMessage = outcomes.low;
-            } else if (yesCounter <= 5) {
-                finalMessage = outcomes.medium;
-            } else if (yesCounter <= 8) {
-                finalMessage = outcomes.high;
-            } else {
-                finalMessage = outcomes.expert;
-            }
-
-            // Display message along with a small counter note
-            document.getElementById("result-message").innerHTML = `<strong>${finalMessage}</strong><br><br><small>(Du hast ${yesCounter} von 10 Fragen mit JA beantwortet.)</small>`;
-        }
-
-        function restartQuiz() {
-            // Reset counters
-            currentQuestionIndex = 0;
-            yesCounter = 0;
-            
-            // Reset UI components
-            document.getElementById("progress").style.width = "0%";
-            
-            // Switch views back
-            document.getElementById("result-view").classList.remove("active");
-            document.getElementById("quiz-view").classList.add("active");
-            
-            // Initialize first question
-            updateQuiz();
-        }
-
-        // Initialize quiz on first page load
+        currentQuestionIndex++;
         updateQuiz();
+      }
+
+      function showResults() {
+        // Switch views
+        document.getElementById("quiz-view").classList.remove("active");
+        document.getElementById("result-view").classList.add("active");
+
+        // Determine final answer based on counter score
+        let finalMessage = "";
+        if (yesCounter <= 2) {
+          finalMessage = outcomes.low;
+        } else if (yesCounter <= 5) {
+          finalMessage = outcomes.medium;
+        } else if (yesCounter <= 8) {
+          finalMessage = outcomes.high;
+        } else {
+          finalMessage = outcomes.expert;
+        }
+
+        // Display message along with a small counter note
+        document.getElementById("result-message").innerHTML =
+          `<strong>${finalMessage}</strong><br><br><small>(Du hast ${yesCounter} von 10 Fragen mit JA beantwortet.)</small>`;
+      }
+
+      function restartQuiz() {
+        // Reset counters
+        currentQuestionIndex = 0;
+        yesCounter = 0;
+
+        // Reset UI components
+        document.getElementById("progress").style.width = "0%";
+
+        // Switch views back
+        document.getElementById("result-view").classList.remove("active");
+        document.getElementById("quiz-view").classList.add("active");
+
+        // Initialize first question
+        updateQuiz();
+      }
+
+      // Initialize quiz on first page load
+      updateQuiz();
     </script>
-</body>
+  </body>
 </html>
