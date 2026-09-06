@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Convention Quiz</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --primary: #3498db;
+            --yes-color: #2ecc71;
+            --yes-hover: #27ae60;
+            --no-color: #e74c3c;
+            --no-hover: #c0392b;
+        }
+
+        /* Prevent scrolling and text selection for a kiosk/iPad feel */
+        * {
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 768px; /* Optimized for iPad portrait width */
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            height: 12px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 2.2rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin: auto 0;
+            padding: 20px 0;
+        }
+
+        .result-text {
+            font-size: 2rem;
+            line-height: 1.5;
+            margin-bottom: 40px;
+        }
+
+        /* Large Touch Buttons */
+        .btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 35px 0;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-yes {
+            background-color: var(--yes-color);
+        }
+        
+        .btn-no {
+            background-color: var(--no-color);
+        }
+
+        .btn-restart {
+            background-color: var(--primary);
+            grid-column: span 2;
+            padding: 25px 0;
+            font-size: 1.6rem;
+        }
+
+        /* Views management */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- QUIZ VIEW -->
+        <div id="quiz-view" class="card view active">
+            <div class="progress-container">
+                <div id="progress" class="progress-bar"></div>
+            </div>
+            <div id="question" class="question-text">Lade Frage...</div>
+            <div class="btn-container">
+                <button class="btn btn-yes" onclick="handleAnswer(true)">JA</button>
+                <button class="btn btn-no" onclick="handleAnswer(false)">NEIN</button>
+            </div>
+        </div>
+
+        <!-- RESULT VIEW -->
+        <div id="result-view" class="card view">
+            <h1>Dein Ergebnis</h1>
+            <div id="result-message" class="result-text">Lade Auswertung...</div>
+            <div class="btn-container">
+                <button class="btn btn-restart" onclick="restartQuiz()">Neu starten</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define your 10 custom questions here
+        const questions = [
+            "Nutzt du bereits aktiv KI-Tools in deinem Alltag?",
+            "Hast du schon mal eine eigene Website live geschaltet?",
+            "Trinkst du mehr als zwei Tassen Kaffee am Tag?",
+            "Besuchst du diese Convention zum ersten Mal?",
+            "Arbeitest du in der IT- oder Design-Branche?",
+            "Hast du heute schon Netzwerkkarten ausgetauscht?",
+            "Bevorzugst du das Homeoffice gegenüber dem Büro?",
+            "Hast du ein eigenes GitHub-Profil?",
+            "Spielst du in deiner Freizeit Videospiele?",
+            "Freust du dich schon auf das nächste Event dieser Art?"
+        ];
+
+        // Define your 4 dynamic outcomes based on the number of "Yes" answers
+        const outcomes = {
+            low: "Ergebnis 1: Du bist eher der gemütliche Beobachter. Schön, dass du da bist!",      // 0-2 Yes
+            medium: "Ergebnis 2: Du bist interessiert und schnupperst gerade in neue Themen rein.", // 3-5 Yes
+            high: "Ergebnis 3: Du bist voll involviert und nutzt die Convention optimal!",         // 6-8 Yes
+            expert: "Ergebnis 4: Absoluter Profi! Du lebst und atmest diese Themenbranche."        // 9-10 Yes
+        };
+
+        let currentQuestionIndex = 0;
+        let yesCounter = 0;
+
+        function updateQuiz() {
+            if (currentQuestionIndex < questions.length) {
+                // Update question text
+                document.getElementById("question").innerText = questions[currentQuestionIndex];
+                // Update progress bar
+                const progressPercent = (currentQuestionIndex / questions.length) * 100;
+                document.getElementById("progress").style.width = progressPercent + "%";
+            } else {
+                showResults();
+            }
+        }
+
+        function handleAnswer(isYes) {
+            if (isYes) {
+                yesCounter++;
+            }
+            currentQuestionIndex++;
+            updateQuiz();
+        }
+
+        function showResults() {
+            // Switch views
+            document.getElementById("quiz-view").classList.remove("active");
+            document.getElementById("result-view").classList.add("active");
+
+            // Determine final answer based on counter score
+            let finalMessage = "";
+            if (yesCounter <= 2) {
+                finalMessage = outcomes.low;
+            } else if (yesCounter <= 5) {
+                finalMessage = outcomes.medium;
+            } else if (yesCounter <= 8) {
+                finalMessage = outcomes.high;
+            } else {
+                finalMessage = outcomes.expert;
+            }
+
+            // Display message along with a small counter note
+            document.getElementById("result-message").innerHTML = `<strong>${finalMessage}</strong><br><br><small>(Du hast ${yesCounter} von 10 Fragen mit JA beantwortet.)</small>`;
+        }
+
+        function restartQuiz() {
+            // Reset counters
+            currentQuestionIndex = 0;
+            yesCounter = 0;
+            
+            // Reset UI components
+            document.getElementById("progress").style.width = "0%";
+            
+            // Switch views back
+            document.getElementById("result-view").classList.remove("active");
+            document.getElementById("quiz-view").classList.add("active");
+            
+            // Initialize first question
+            updateQuiz();
+        }
+
+        // Initialize quiz on first page load
+        updateQuiz();
+    </script>
+</body>
+</html>
